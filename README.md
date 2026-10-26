@@ -4,7 +4,7 @@ This repository is a fork of [nidhiiiii0707/green-fleet-optimizer](https://githu
 
 This repository contains a maritime fleet optimization research pipeline. It loads the supplied datasets independently, exposes traceable parameter views, validates candidates against explicit feasibility constraints, calls the existing (un-retrained) XGBoost `XGBRegressor` fuel model, converts predictions into Fuel/Cost/GHG objectives, and searches the resulting decision space with four independent optimizers -- **NSGA-II**, **QBHO** (Quantum-Behaved Hawks Optimization -- a classical Harris-Hawks-based metaheuristic with a quantum-behaved position update), **CQM** (a real `dimod` Constrained Quadratic Model, solved by an exact/classical-annealing solver), and an exact **MILP** reference -- merging their outputs into one Pareto-optimal fleet-plan archive. A natural-language front end (`nlp/`) sits in front of this pipeline and translates plain-English fleet requests into the same structured candidates/constraints the pipeline already consumes.
 
-**QUBO-SA and MO-QIGA (the previous active set alongside NSGA-II/MILP) are retained in the repository for reference/backup** (`qubo_model.py`/`qubo_builder.py`, `mo_qiga.py`, still runnable standalone via `run_qubo.py`/`run_mo_qiga.py`) but are **no longer part of the active pipeline**; they were replaced by QBHO and CQM respectively.
+**MO-QIGA remains available for historical comparison** through `mo_qiga.py` and `run_mo_qiga.py`, but is no longer part of the active pipeline. Historical QUBO results remain in `qubo_results.csv`; the earlier `qubo_model.py`, `qubo_builder.py` and `run_qubo.py` source files are not included in this checkout, so no standalone QUBO execution is claimed.
 
 See [FINAL_OPTIMIZATION_REPORT.md](FINAL_OPTIMIZATION_REPORT.md) for the full data-provenance and results write-up, and [mathematical_formulation.md](mathematical_formulation.md) for the exact objective/constraint formulation used by each optimizer.
 
@@ -60,6 +60,8 @@ Every `ParameterView` contains a `data` table and a `provenance` table. Provenan
 No parameter view performs a cross-source key join or builds a giant combined dataset.
 
 ## Dataset contributions
+
+The table below records the historical source inventory and its intended contribution. Many of these raw source files are not bundled in this fork. The current pipeline consumes the root-level derived CSVs and the included `data/cps_poseidon_sample.csv`; inspect the data loaders before attempting to reproduce older raw-data analyses.
 
 | Dataset | Optimization-relevant information |
 |---|---|
