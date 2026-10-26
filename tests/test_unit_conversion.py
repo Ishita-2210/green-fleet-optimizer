@@ -11,6 +11,29 @@ from unit_conversion import (
 )
 
 
+@pytest.mark.parametrize("value", [float("nan"), float("inf"), float("-inf"), -1.0])
+def test_nonfinite_or_negative_quantities_rejected(value):
+    for quantity in (HoursQuantity, FuelRate):
+        with pytest.raises(ValueError):
+            quantity(value)
+    with pytest.raises(ValueError):
+        voyage_distance_to_hours(value, 10)
+    with pytest.raises(ValueError):
+        voyage_distance_to_hours(10, value)
+    with pytest.raises(ValueError):
+        rate_to_voyage_fuel(FuelRate(1), assumed_interval_hours=value)
+
+
+def test_unlabelled_duration_and_overflow_rejected():
+    with pytest.raises(TypeError, match="HoursQuantity"):
+        rate_to_voyage_fuel(FuelRate(1), 10)
+    with pytest.raises(ValueError):
+        rate_to_voyage_fuel(FuelRate(1e308), HoursQuantity(1e308))
+    for convert in (fuel_to_cost_usd, fuel_to_ghg_kgco2):
+        with pytest.raises(ValueError):
+            convert(rate_to_voyage_fuel(FuelRate(1)), float("nan"))
+
+
 def test_voyage_distance_to_hours_is_distance_over_speed():
     h = voyage_distance_to_hours(distance_nm=100.0, speed_knots=10.0)
     assert h.hours == pytest.approx(10.0)

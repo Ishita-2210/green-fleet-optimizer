@@ -18,6 +18,12 @@ incompatible-unit multiplication bug.
 from __future__ import annotations
 
 from dataclasses import dataclass
+from math import isfinite
+
+
+def _nonnegative_finite(value: float, name: str) -> None:
+    if not isfinite(value) or value < 0:
+        raise ValueError(f"{name} must be finite and nonnegative")
 
 # SCENARIO_INPUT: no timestamp column exists in the raw telemetry, so the
 # per-row sampling interval implied by "momentary" is assumed to be 1 hour.
@@ -30,14 +36,16 @@ class HoursQuantity:
     hours: float
 
     def __post_init__(self) -> None:
-        if self.hours < 0:
-            raise ValueError("hours cannot be negative")
+        _nonnegative_finite(self.hours, "hours")
 
 
 @dataclass(frozen=True)
 class FuelRate:
     """The model's raw output: an undocumented-unit RATE, never a total."""
     value: float
+
+    def __post_init__(self) -> None:
+        _nonnegative_finite(self.value, "fuel rate")
 
 
 @dataclass(frozen=True)
@@ -46,9 +54,13 @@ class VoyageFuel:
     value: float
     unit_status: str = "ASSUMED_UNIT (ratexhours; base physical unit of the XGB target is undocumented)"
 
+    def __post_init__(self) -> None:
+        _nonnegative_finite(self.value, "voyage fuel")
+
 
 def voyage_distance_to_hours(distance_nm: float, speed_knots: float) -> HoursQuantity:
-    if speed_knots <= 0:
+    _nonnegative_finite(distance_nm, "distance_nm")
+    if not isfinite(speed_knots) or speed_knots <= 0:
         raise ValueError("speed_knots must be > 0 to compute voyage hours")
     return HoursQuantity(distance_nm / speed_knots)
 
@@ -63,7 +75,10 @@ def rate_to_voyage_fuel(
     (voyage duration) or falls back to the SCENARIO_INPUT single-sample interval.
     Never accepts a bare, unlabelled number for the time term.
     """
+    if duration is not None and not isinstance(duration, HoursQuantity):
+        raise TypeError("duration must be an explicit HoursQuantity")
     hours = duration.hours if duration is not None else assumed_interval_hours
+    _nonnegative_finite(hours, "duration hours")
     return VoyageFuel(rate.value * hours)
 
 
@@ -71,8 +86,14 @@ def fuel_to_cost_usd(fuel: VoyageFuel, price_usd_per_unit: float) -> float:
     """price_usd_per_unit must already be denominated in the SAME assumed
     fuel unit as `fuel` (see data_layer.SCENARIO_FUEL_PRICE_USD_PER_TONNE).
     """
-    return fuel.value * price_usd_per_unit
+    _nonnegative_finite(price_usd_per_unit, "price_usd_per_unit")
+    result = fuel.value * price_usd_per_unit
+    _nonnegative_finite(result, "cost")
+    return result
 
 
 def fuel_to_ghg_kgco2(fuel: VoyageFuel, emission_factor_kgco2_per_unit: float) -> float:
-    return fuel.value * emission_factor_kgco2_per_unit
+    _nonnegative_finite(emission_factor_kgco2_per_unit, "emission factor")
+    result = fuel.value * emission_factor_kgco2_per_unit
+    _nonnegative_finite(result, "GHG")
+    return result

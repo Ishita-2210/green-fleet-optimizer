@@ -1,6 +1,8 @@
 # Green Fleet Optimization Foundation
 
-This repository implements a full, working maritime fleet optimization pipeline. It loads the supplied datasets independently, exposes traceable parameter views, validates candidates against explicit feasibility constraints, calls the existing (un-retrained) XGBoost `XGBRegressor` fuel model, converts predictions into Fuel/Cost/GHG objectives, and searches the resulting decision space with four independent optimizers -- **NSGA-II**, **QBHO** (Quantum-Behaved Hawks Optimization -- a classical Harris-Hawks-based metaheuristic with a quantum-behaved position update), **CQM** (a real `dimod` Constrained Quadratic Model, solved by an exact/classical-annealing solver), and an exact **MILP** reference -- merging their outputs into one Pareto-optimal fleet-plan archive. A natural-language front end (`nlp/`) sits in front of this pipeline and translates plain-English fleet requests into the same structured candidates/constraints the pipeline already consumes.
+This repository is a fork of [nidhiiiii0707/green-fleet-optimizer](https://github.com/nidhiiiii0707/green-fleet-optimizer). Upstream authorship, project identity and existing artifacts are preserved. Fork maintenance does not imply original authorship of the upstream optimizer.
+
+This repository contains a maritime fleet optimization research pipeline. It loads the supplied datasets independently, exposes traceable parameter views, validates candidates against explicit feasibility constraints, calls the existing (un-retrained) XGBoost `XGBRegressor` fuel model, converts predictions into Fuel/Cost/GHG objectives, and searches the resulting decision space with four independent optimizers -- **NSGA-II**, **QBHO** (Quantum-Behaved Hawks Optimization -- a classical Harris-Hawks-based metaheuristic with a quantum-behaved position update), **CQM** (a real `dimod` Constrained Quadratic Model, solved by an exact/classical-annealing solver), and an exact **MILP** reference -- merging their outputs into one Pareto-optimal fleet-plan archive. A natural-language front end (`nlp/`) sits in front of this pipeline and translates plain-English fleet requests into the same structured candidates/constraints the pipeline already consumes.
 
 **QUBO-SA and MO-QIGA (the previous active set alongside NSGA-II/MILP) are retained in the repository for reference/backup** (`qubo_model.py`/`qubo_builder.py`, `mo_qiga.py`, still runnable standalone via `run_qubo.py`/`run_mo_qiga.py`) but are **no longer part of the active pipeline**; they were replaced by QBHO and CQM respectively.
 
@@ -214,3 +216,12 @@ Still true limitations, carried over unchanged from the sections above:
 - The candidate set remains prototype-scale (252 candidates / 6 legs / 4
   vessel classes), chosen to keep all four optimizers' runtimes manageable for
   validation, not a production fleet size.
+
+
+## Portable setup and bounded checks
+
+The `.venv2` paths earlier in this document describe an existing development environment, not a directory shipped in the repository. For a new checkout, create and activate a virtual environment with Python 3.13, then run `python -m pip install -r requirements.txt`. Use `python -m pytest -q` and `python run_optimization_pipeline.py` from the repository root. The dashboard is a separate npm project under `core_dashboard_prototype`.
+
+GitHub Actions checks the explicit unit-conversion contracts without loading model weights or requiring an external data tree. `HoursQuantity`, `FuelRate`, voyage totals, distances, speeds, prices and emission factors reject nonfinite or negative physical quantities. Rate conversion requires a labelled duration; overflow is rejected rather than becoming an infinite objective. This does not resolve the undocumented physical unit of the model target: the scenario assumptions above still apply.
+
+Full optimization, model compatibility and externally sourced datasets require the larger dependency stack and their own checks. Existing reports are historical evidence, not measurements produced by CI. No upstream licensing terms have been replaced or newly assigned.
