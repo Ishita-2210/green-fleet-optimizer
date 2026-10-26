@@ -11,11 +11,12 @@
 > 3. CQM
 > 4. MILP
 >
-> The legacy `qubo_model.py`, `qubo_builder.py`, `qubo_validation.py`, `run_qubo.py`,
-> `mo_qiga.py`, `run_mo_qiga.py`, and `tests/test_qubo.py` have since been deleted from
-> the repository. The "Reproduce everything" commands below have been updated to use
-> the current entry points; everything else in this file describes the checkpoint as
-> it was and is kept for historical reference.
+> Present checkout: `mo_qiga.py` and `run_mo_qiga.py` remain for historical comparison,
+> outside the active pipeline. The legacy `qubo_model.py`, `qubo_builder.py`,
+> `qubo_validation.py`, `run_qubo.py` and `tests/test_qubo.py` are absent; preserved
+> QUBO results do not establish a runnable standalone QUBO implementation. The
+> "Reproduce everything" commands below use current entry points; the remaining
+> checkpoint description is kept for historical reference.
 
 Everything from Checkpoint 4, plus Stages 8-15: NSGA-II, QUBO (simulated annealing,
 classical), MO-QIGA (classical simulation of a quantum-inspired heuristic), exact MILP

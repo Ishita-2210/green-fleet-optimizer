@@ -194,10 +194,11 @@ Implemented and passing (`./.venv2/Scripts/python.exe -m pytest -q`):
   a real `dimod` Constrained Quadratic Model solved by an exact or
   classical-annealing solver), and **MILP** (`milp_model.py`, exact
   reference) -- run on the identical decision space and merge into one
-  Pareto archive (`run_optimization_pipeline.py`). **QUBO-SA**
-  (`qubo_model.py` / `qubo_builder.py`) and **MO-QIGA** (`mo_qiga.py`) are
-  retained in the repository (still runnable via `run_qubo.py` /
-  `run_mo_qiga.py`) but are no longer part of the active pipeline.
+  Pareto archive (`run_optimization_pipeline.py`). **MO-QIGA** sources
+  (`mo_qiga.py` / `run_mo_qiga.py`) remain for historical comparison outside
+  the active pipeline. Historical **QUBO-SA** results remain in
+  `qubo_results.csv`, but `qubo_model.py`, `qubo_builder.py` and
+  `run_qubo.py` are absent; no standalone QUBO execution is claimed.
 - The natural-language front end described above, tested end-to-end from raw
   text through to Pareto fleet plans (`tests/test_nlp_optimization_adapter.py`).
 
